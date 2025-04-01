@@ -5,12 +5,10 @@ export class PetService {
   static async createPet(data: any) {
     const existingPet = await new PetRepository().findExistingPet(data);
     if (existingPet) {
-      if (existingPet) {
-        throw new CustomError(
-          'Ops... Já existe um Animalzinho com esses dados.',
-          400,
-        );
-      }
+      throw new CustomError(
+        'Ops... Já existe um Animalzinho com esses dados.',
+        400,
+      );
     }
     return await new PetRepository().create(data);
   }
