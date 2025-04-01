@@ -15,8 +15,11 @@ export class GenericRepository<T> {
     return await this.model.findUnique({ where: { id } });
   }
 
-  async findAll() {
-    return await this.model.findMany();
+  async findAll(skip: number = 0, limit: number = 10) {
+    return await this.model.findMany({
+      skip,
+      take: limit,
+    });
   }
 
   async update(id: number, data: Partial<T>) {
