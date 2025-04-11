@@ -75,4 +75,11 @@ export class UserService {
 
     return completeUser;
   }
+  static async getUserByID(id: number) {
+    const user = await new UserRepository().findUserWithDetails(id);
+    if (!user) {
+      throw new CustomError('Usuário não encontrado.', 404);
+    }
+    return user;
+  }
 }

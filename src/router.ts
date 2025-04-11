@@ -10,3 +10,4 @@ router.get('/pets', PetController.getAllPets);
 
 //Rotas p/ User
 router.post('/user', UserController.createUser);
+router.get('/user/:id', UserController.getUserByID);
