@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { CustomError } from '../errors/CustomError';
 import { UserService } from '../services/UserService';
+import { CustomError } from '../errors/CustomError';
 
 export class UserController {
-  static async createUser(req: Request, res: Response): Promise<any> {
+  static async store(req: Request, res: Response): Promise<any> {
     try {
       const user = await UserService.createUser(req.body);
       return res.status(201).json(user);
@@ -16,7 +16,7 @@ export class UserController {
         .json({ message: 'Erro do Servidor.', error: `${error}` });
     }
   }
-  static async getUserByID(req: Request, res: Response): Promise<any> {
+  static async show(req: Request, res: Response): Promise<any> {
     try {
       const user = await UserService.getUserByID(Number(req.params.id));
       return res.status(200).json(user);

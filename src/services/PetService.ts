@@ -14,7 +14,7 @@ export class PetService {
   }
 
   static async getPetByID(id: number) {
-    const pet = await new PetRepository().findById(id);
+    const pet = await new PetRepository().show(id);
     if (!pet) {
       throw new CustomError('Pet não encontrado.', 404);
     }
@@ -23,7 +23,7 @@ export class PetService {
 
   static async getAllPets(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
-    return await new PetRepository().findAll(skip, limit);
+    return await new PetRepository().index(skip, limit);
   }
 
   static async updatePet(id: number, data: any) {
@@ -31,6 +31,6 @@ export class PetService {
   }
 
   static async deletePet(id: number) {
-    return await new PetRepository().delete(id);
+    return await new PetRepository().destroy(id);
   }
 }

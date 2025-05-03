@@ -1,4 +1,5 @@
 import { prisma } from '../database/prisma';
+import { CreatePetDTO } from '../interfaces/IPet';
 import { GenericRepository } from './GenericRepository';
 
 export class PetRepository extends GenericRepository<any> {
@@ -12,11 +13,7 @@ export class PetRepository extends GenericRepository<any> {
     });
   }
 
-  async findExistingPet(data: {
-    name: string;
-    gender: string;
-    birthDate: Date;
-  }) {
+  async findExistingPet(data: CreatePetDTO) {
     return await prisma.pet.findFirst({
       where: {
         name: data.name,

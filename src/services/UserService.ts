@@ -1,11 +1,29 @@
 import { CustomError } from '../errors/CustomError';
+import {
+  CreateCompanyUserDTO,
+  CreateIndividualUserDTO,
+} from '../interfaces/IUser';
 import { AddressRepository } from '../repositories/User/AddressRepository';
 import { CompanyUserRepository } from '../repositories/User/CompanyUserRepository';
 import { IndividualUserRepository } from '../repositories/User/IndividualUserRepository';
 import { UserRepository } from '../repositories/User/UserRepository';
 
+function isIndividualUser(
+  data: CreateIndividualUserDTO | CreateCompanyUserDTO,
+): data is CreateIndividualUserDTO {
+  return (data as CreateIndividualUserDTO).cpf !== undefined;
+}
+
+function isCompanyUser(
+  data: CreateIndividualUserDTO | CreateCompanyUserDTO,
+): data is CreateCompanyUserDTO {
+  return (data as CreateCompanyUserDTO).cnpj !== undefined;
+}
+
 export class UserService {
-  static async createUser(data: any) {
+  static async createUser(
+    data: CreateIndividualUserDTO | CreateCompanyUserDTO,
+  ) {
     const userRepository = new UserRepository();
     const individualUserRepository = new IndividualUserRepository();
     const companyUserRepository = new CompanyUserRepository();
@@ -18,32 +36,27 @@ export class UserService {
         400,
       );
 
-    if (data.cpf === '') {
-      throw new CustomError('É necessário informar um CPF válido.', 400);
-    } else if (data.cpf) {
+    if (isIndividualUser(data)) {
+      if (!data.cpf || data.cpf.trim() === '') {
+        throw new CustomError('É necessário informar um CPF válido.', 400);
+      }
+
       const existingCpf = await individualUserRepository.findByCpf(data.cpf);
       if (existingCpf)
         throw new CustomError('CPF informado já cadastrado.', 400);
-    }
-    if (data.cnpj === '') {
-      throw new CustomError('É necessário informar um CNPJ válido.', 400);
-    } else if (data.cnpj) {
+    } else if (isCompanyUser(data)) {
+      if (!data.cnpj || data.cnpj.trim() === '') {
+        throw new CustomError('É necessário informar um CNPJ válido.', 400);
+      }
+
       const existingCnpj = await companyUserRepository.findByCnpj(data.cnpj);
       if (existingCnpj)
         throw new CustomError('CNPJ informado já cadastrado.', 400);
-    }
-
-    // Verifica se está criando um usuário individual ou empresa
-    if (data.cpf && !data.cnpj) {
-      // Se é um usuário individual e o CPF não foi informado
-      if (!data.cpf || data.cpf === '') {
-        throw new CustomError('É necessário informar um CPF válido.', 400);
-      }
-    } else if (data.cnpj && !data.cpf) {
-      // Se é um usuário Ong e o CNPJ não foi informado
-      if (!data.cnpj || data.cnpj === '') {
-        throw new CustomError('É necessário informar um CNPJ válido.', 400);
-      }
+    } else {
+      throw new CustomError(
+        'É necessário informar um CPF ou CNPJ para o cadastro.',
+        400,
+      );
     }
 
     const newUser = await userRepository.create({
@@ -53,12 +66,12 @@ export class UserService {
       phone: data.phone,
     });
 
-    if (data.cpf) {
+    if (isIndividualUser(data)) {
       await individualUserRepository.create({
         userId: newUser.id,
         cpf: data.cpf,
       });
-    } else if (data.cnpj) {
+    } else if (isCompanyUser(data)) {
       await companyUserRepository.create({
         userId: newUser.id,
         cnpj: data.cnpj,

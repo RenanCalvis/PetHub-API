@@ -11,11 +11,11 @@ export class GenericRepository<T> {
     return await this.model.create({ data });
   }
 
-  async findById(id: number) {
+  async show(id: number) {
     return await this.model.findUnique({ where: { id } });
   }
 
-  async findAll(skip: number = 0, limit: number = 10) {
+  async index(skip: number = 0, limit: number = 10) {
     return await this.model.findMany({
       skip,
       take: limit,
@@ -29,7 +29,7 @@ export class GenericRepository<T> {
     });
   }
 
-  async delete(id: number) {
+  async destroy(id: number) {
     return await this.model.delete({ where: { id } });
   }
 }

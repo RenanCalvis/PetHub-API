@@ -25,6 +25,8 @@ model User {
   individualUser IndividualUser?
   companyUser    CompanyUser?
   address        Address?
+
+  ads Ad[]
 }
 
 model IndividualUser {
@@ -50,13 +52,28 @@ model Address {
 }
 
 model Pet {
+  id        Int      @id @default(autoincrement())
+  name      String
+  gender    String
+  size      String
+  birthDate DateTime
+  vaccines  String[]
+  // description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ads Ad[]
+}
+
+model Ad {
   id          Int      @id @default(autoincrement())
-  name        String
-  gender      String
-  size        String
-  birthDate   DateTime
-  vaccines    String[]
-  description String?
+  description String
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  pet   Pet @relation(fields: [petId], references: [id])
+  petId Int 
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 }
