@@ -5,6 +5,7 @@ export interface IPet {
   size: string;
   birthDate: string;
   vaccines: string[];
+  image?: string;
   createdAt: Date;
   updatedAt: Date;
 }

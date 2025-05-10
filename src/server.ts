@@ -1,11 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { router } from './router';
+import path from 'path';
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 app.use(router);
+app.use('/files', express.static(path.resolve(__dirname, '..', 'uploads')));
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);

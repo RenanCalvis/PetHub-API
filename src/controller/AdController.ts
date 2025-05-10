@@ -1,12 +1,39 @@
 import { Request, Response } from 'express';
 import { AdService } from '../services/AdService';
 import { CustomError } from '../errors/CustomError';
+import { upload } from '../config/upload';
 
 export class AdController {
   static async store(req: Request, res: Response): Promise<any> {
     try {
-      const ad = await AdService.createAd(req.body);
-      return res.status(201).json(ad);
+      // Primeiro, fazemos o upload da imagem
+      upload.single('image')(req, res, async (err) => {
+        if (err) {
+          return res
+            .status(400)
+            .json({ message: 'Erro ao fazer upload da imagem.' });
+        }
+
+        // Extraímos os dados de `data` do body e a imagem que foi enviada
+        const { description, userId, pet } = JSON.parse(req.body.data);
+
+        // Adicionamos o nome da imagem ao objeto pet
+        const imageFilename = req.file?.filename;
+
+        // Garantimos que o nome da imagem seja passado junto ao pet
+        const petWithImage = {
+          ...pet,
+          image: imageFilename, // O nome do arquivo da imagem
+        };
+
+        const ad = await AdService.createAd({
+          description,
+          userId: Number(userId),
+          pet: petWithImage, // Passamos o pet com a imagem
+        });
+
+        return res.status(201).json(ad);
+      });
     } catch (error) {
       if (error instanceof CustomError) {
         return res.status(error.status).json({ message: error.message });
