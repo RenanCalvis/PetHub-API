@@ -59,9 +59,9 @@ export class AdService {
     return ad;
   }
 
-  static async getAllAds(page: number = 1, limit: number = 10) {
+  static async getAllAds(page: number = 1, limit: number = 10, isActive?: boolean, excludeId?: number) {
     const skip = (page - 1) * limit;
-    return await new AdRepository().index(skip, limit);
+    return await new AdRepository().index(skip, limit, isActive, excludeId);
   }
 
   static async updateAd(id: number, data: any) {

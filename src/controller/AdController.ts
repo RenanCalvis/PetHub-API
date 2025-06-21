@@ -32,7 +32,11 @@ export class AdController {
     try {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 10;
-      const ads = await AdService.getAllAds(page, limit);
+      const isActive = req.query.isActive === 'true' ? true : undefined;
+      const excludeId = req.query.excludeId
+        ? Number(req.query.excludeId)
+        : undefined;
+      const ads = await AdService.getAllAds(page, limit, isActive, excludeId);
       return res.status(200).json(ads);
     } catch (error) {
       if (error instanceof CustomError) {

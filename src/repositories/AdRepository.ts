@@ -11,12 +11,23 @@ export class AdRepository extends GenericRepository<any> {
     super(prisma.ad);
   }
 
-  async index(skip: number = 0, limit: number = 10) {
+  async index(
+    skip: number = 0,
+    limit: number = 10,
+    isActive?: boolean,
+    excludeId?: number,
+  ) {
+    const whereClause: any = {};
+
+    if (isActive !== undefined) whereClause.isActive = isActive;
+    if (excludeId !== undefined) whereClause.id = { not: excludeId };
+
     return await prisma.ad.findMany({
+      where: whereClause,
       skip,
       take: limit,
-      include:{
-        pet: true
+      include: {
+        pet: true,
       },
     });
   }

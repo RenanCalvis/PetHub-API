@@ -6,6 +6,7 @@ export class UserController {
   static async store(req: Request, res: Response): Promise<any> {
     try {
       const user = await UserService.createUser(req.body);
+      console.log(user);
       return res.status(201).json(user);
     } catch (error) {
       if (error instanceof CustomError) {
