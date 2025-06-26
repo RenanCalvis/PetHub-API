@@ -42,6 +42,46 @@ export class AdRepository extends GenericRepository<any> {
     });
   }
 
+  async update(adId: number, data: any) {
+    // Primeiro obtenha o anúncio atual para pegar o petId
+    const currentAd = await prisma.ad.findUnique({
+      where: { id: adId },
+      select: { petId: true },
+    });
+
+    if (!currentAd) {
+      throw new Error('Anúncio não encontrado');
+    }
+
+    // Atualize o pet separadamente se existirem dados do pet
+    if (data.pet) {
+      await prisma.pet.update({
+        where: { id: currentAd.petId },
+        data: {
+          name: data.pet.name,
+          gender: data.pet.gender,
+          size: data.pet.size,
+          birthDate: data.pet.birthDate,
+          vaccines: data.pet.vaccines,
+        },
+      });
+    }
+
+    // Depois atualize o anúncio
+    return await prisma.ad.update({
+      where: { id: adId },
+      data: {
+        description: data.description,
+        isActive: data.isActive,
+        userId: data.userId,
+      },
+      include: {
+        pet: true,
+        user: true,
+      },
+    });
+  }
+
   async findByUserId(userId: number) {
     return await prisma.ad.findMany({
       where: { userId },

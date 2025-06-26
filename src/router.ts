@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PetController } from './controller/PetController';
 import { UserController } from './controller/UserController';
 import { AdController } from './controller/AdController';
+import { authenticateToken } from './helper/jwt/middewares/authenticateToken';
 
 export const router = Router();
 //Rotas p/ Pets
@@ -12,6 +13,7 @@ router.get('/pets', PetController.index);
 //Rotas p/ User
 router.post('/user', UserController.store);
 router.get('/user/:id', UserController.show);
+router.post('/login', UserController.login);
 
 // Rotas p/ Ads
 router.post('/ads', AdController.store);

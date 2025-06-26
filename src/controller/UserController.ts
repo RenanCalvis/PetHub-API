@@ -28,4 +28,17 @@ export class UserController {
       return res.status(500).json({ message: 'Erro do Servidor.' });
     }
   }
+
+  static async login(req: Request, res: Response): Promise<any> {
+    const { email, password } = req.body;
+    try {
+      const user = await UserService.login(email, password);
+      return res.status(200).json(user);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        return res.status(error.status).json({ message: error.message });
+      }
+      return res.status(500).json({ message: 'Erro do Servidor.' });
+    }
+  }
 }

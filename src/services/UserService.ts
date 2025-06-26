@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
 import {
   CreateCompanyUserDTO,
@@ -7,6 +8,8 @@ import { AddressRepository } from '../repositories/User/AddressRepository';
 import { CompanyUserRepository } from '../repositories/User/CompanyUserRepository';
 import { IndividualUserRepository } from '../repositories/User/IndividualUserRepository';
 import { UserRepository } from '../repositories/User/UserRepository';
+import { generateKey } from 'crypto';
+import { generateToken } from '../helper/jwt/generateToken';
 
 function isIndividualUser(
   data: CreateIndividualUserDTO | CreateCompanyUserDTO,
@@ -59,10 +62,12 @@ export class UserService {
       );
     }
 
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
     const newUser = await userRepository.create({
       name: data.name,
       email: data.email,
-      password: data.password,
+      password: hashedPassword,
       phone: data.phone,
     });
 
@@ -94,5 +99,33 @@ export class UserService {
       throw new CustomError('Usuário não encontrado.', 404);
     }
     return user;
+  }
+
+  static async login(email: string, password: string) {
+    const user = await new UserRepository().findByEmail(email);
+    if (!user) {
+      throw new CustomError('Email não encontrado.', 404);
+    }
+    // const passwordMatch = await bcrypt.compare(password, user.password);
+    const storedPassword = user.password;
+
+    // Verifica se é hash (bcrypt hashes começam com $2a$, $2b$, etc)
+    const isHashed =
+      storedPassword.startsWith('$2a$') ||
+      storedPassword.startsWith('$2b$') ||
+      storedPassword.startsWith('$2y$');
+
+    let passwordMatch = false;
+    if (isHashed) {
+      passwordMatch = await bcrypt.compare(password, storedPassword);
+    } else {
+      // Senha armazenada em texto puro — compara direto
+      passwordMatch = password === storedPassword;
+    }
+    if (!passwordMatch) {
+      throw new CustomError('Senha incorreta.', 401);
+    }
+    const token = generateToken({ userId: user.id, email: user.email });
+    return { user, token };
   }
 }
