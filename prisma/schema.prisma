@@ -72,8 +72,17 @@ model Ad {
   createdAt   DateTime @default(now())
 
   pet   Pet @relation(fields: [petId], references: [id])
-  petId Int 
+  petId Int
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id])
   userId Int
+  photos Photo[] // Um anúncio pode ter várias fotos
+}
+
+model Photo {
+  id        Int      @id @default(autoincrement())
+  url       String // Vai armazenar o caminho/nome da foto
+  adId      Int // Relacionamento com o anúncio
+  ad        Ad       @relation(fields: [adId], references: [id])
+  createdAt DateTime @default(now())
 }
