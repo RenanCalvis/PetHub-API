@@ -1,36 +1,28 @@
 import { Request, Response } from 'express';
-import { prisma } from '../database/prisma';
+import { PhotoService } from '../services/PhotoService';
+import { CustomError } from '../errors/CustomError';
 
 export class PhotoController {
   static async upload(req: Request, res: Response) {
     try {
-      const { adId } = req.body;
+      const { id: adId } = req.params;
       const file = req.file;
 
-      if (!file) {
-        res.status(400).json({ error: 'Nenhuma foto enviada' });
-        return;
-      }
-
-      const photo = await prisma.photo.create({
-        data: {
-          url: file.filename,
-          adId: Number(adId),
-        },
-      });
-
+      const photo = await PhotoService.uploadPhoto(Number(adId), file?.filename ?? '');
       res.status(201).json(photo);
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao enviar foto' });
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Erro ao enviar foto' });
+      }
     }
   }
 
   static async getPhotos(req: Request, res: Response) {
     try {
       const { adId } = req.params;
-      const photos = await prisma.photo.findMany({
-        where: { adId: Number(adId) },
-      });
+      const photos = await PhotoService.getPhotosByAdId(Number(adId));
       res.json(photos);
     } catch (error) {
       res.status(500).json({ error: 'Erro ao buscar fotos' });

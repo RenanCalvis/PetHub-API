@@ -25,12 +25,11 @@ router.delete('/ads/:id', AdController.destroy);
 router.get('/ads/user/:userId', AdController.findByUserId);
 router.get('/ads/filter', AdController.findWithFilters);
 
-
-//Rotas para Photos 
+//Rotas para Photos
 router.post(
   '/ads/:id/photos',
   upload.single('photo'), // Aceita 1 arquivo com o nome "photo"
-  PhotoController.upload // Chama o controller
+  PhotoController.upload, // Chama o controller
 );
 
 router.get('/ads/:adId/photos', PhotoController.getPhotos);
