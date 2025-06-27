@@ -28,6 +28,7 @@ export class AdRepository extends GenericRepository<any> {
       take: limit,
       include: {
         pet: true,
+        photos:true
       },
     });
   }
@@ -38,6 +39,7 @@ export class AdRepository extends GenericRepository<any> {
       include: {
         pet: true,
         user: true,
+        photos:true
       },
     });
   }
@@ -88,6 +90,7 @@ export class AdRepository extends GenericRepository<any> {
       include: {
         pet: true,
         user: true,
+        photos:true,
       },
     });
   }
